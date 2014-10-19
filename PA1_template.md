@@ -1,13 +1,9 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
-```{r}
+
+```r
 setInternet2(use = TRUE)
 tmp <- tempfile()
 download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip",tmp)
@@ -19,27 +15,32 @@ unlink(tmp)
 
 
 ## What is mean total number of steps taken per day?
-```{r}
+
+```r
 dataagg <- aggregate(data$steps, by=list(Category=data$date), FUN=sum,na.rm=TRUE)
 hist(dataagg$x, main="Steps per day",col="red",xlab="")
-
 ```
 
-The mean total number of steps per day is `r sprintf("%.2f", mean(dataagg$x,na.rm=TRUE))` and the median number of steps per day is `r sprintf("%.2f",median(dataagg$x,na.rm=TRUE))`.
+![](./PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
+The mean total number of steps per day is 9354.23 and the median number of steps per day is 10395.00.
 
 ## What is the average daily activity pattern?
 
-```{r}
+
+```r
 aggint <- aggregate(data$steps, by=list(Category=data$interval), FUN=mean,na.rm=TRUE)
 plot(x ~ Category, aggint, type = "l")
-
 ```
 
-The 5-minute interval at `r aggint$Category[aggint$x == max(aggint$x)]`, on average across all the days in the dataset, contains the maximum number of steps (`r  max(aggint$x)`).
+![](./PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
+The 5-minute interval at 835, on average across all the days in the dataset, contains the maximum number of steps (206.1698113).
 
 ## Imputing missing values
 
-```{r}
+
+```r
 imputed <- data.frame(data)
 repfunc <- function(a,b,c) 
   { if(is.na(a)) 
@@ -53,24 +54,27 @@ for(row in 1:length(imputed$steps)) {
 imputedagg <- aggregate(imputed$steps, by=list(Category=imputed$date), FUN=sum,na.rm=TRUE)
 
 hist(imputedagg$x, main="Steps per day",col="red",xlab="")
+```
 
+![](./PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+
+```r
 meandiff <- mean(imputedagg$x,na.rm=TRUE) - mean(dataagg$x,na.rm=TRUE)
              
 if (mean(imputedagg$x,na.rm=TRUE) > mean(dataagg$x,na.rm=TRUE))
   difftext <- "more" else  difftext <- "less"
-
 ```
 
-The number of rows with missing data is `r sum(is.na(data$steps))`.
-The mean total number of steps per day is `r sprintf("%.2f", mean(imputedagg$x,na.rm=TRUE))` and the median number of steps per day is `r sprintf("%.2f",median(imputedagg$x,na.rm=TRUE))`.
+The number of rows with missing data is 2304.
+The mean total number of steps per day is 10766.19 and the median number of steps per day is 10766.19.
 
-There are `r meandiff ` `r difftext ` mean daily steps in the imputed  data than in the original data. 
+There are 1411.959171 more mean daily steps in the imputed  data than in the original data. 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
 
-```{r}
 
+```r
 repday <- function(a) 
   { c("weekend", "weekday", "weekday", "weekday", "weekday", 
     "weekday", "weekend")[as.POSIXlt(a)$wday + 1]
@@ -86,5 +90,6 @@ xyplot(steps ~ interval | day,
         data = aggday,
         type = "l",
         layout = c(1,2))
-
 ```
+
+![](./PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
