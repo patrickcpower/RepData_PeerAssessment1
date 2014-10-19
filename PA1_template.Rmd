@@ -31,7 +31,8 @@ The mean total number of steps per day is `r sprintf("%.2f", mean(dataagg$x,na.r
 
 ```{r}
 aggint <- aggregate(data$steps, by=list(Category=data$interval), FUN=mean,na.rm=TRUE)
-plot(x ~ Category, aggint, type = "l")
+aggint <- aggregate(steps ~ interval,data = data,FUN=function(x) c(steps =mean(x,na.rm=TRUE) ))
+plot(steps ~ interval, aggint, type = "l")
 
 ```
 
@@ -43,7 +44,7 @@ The 5-minute interval at `r aggint$Category[aggint$x == max(aggint$x)]`, on aver
 imputed <- data.frame(data)
 repfunc <- function(a,b,c) 
   { if(is.na(a)) 
-       c$x[c$Category == b]
+       c$steps[c$interval == b]
     else
       a
   }
@@ -51,12 +52,13 @@ for(row in 1:length(imputed$steps)) {
     imputed$steps[row] <- repfunc(imputed$steps[row], imputed$interval[row],aggint) 
 }
 imputedagg <- aggregate(imputed$steps, by=list(Category=imputed$date), FUN=sum,na.rm=TRUE)
+imputedagg <- aggregate(steps ~ date,data = imputed,FUN=function(x) c(steps =sum(x) ) )
 
-hist(imputedagg$x, main="Steps per day",col="red",xlab="")
+hist(imputedagg$steps, main="Steps per day",col="red",xlab="")
 
-meandiff <- mean(imputedagg$x,na.rm=TRUE) - mean(dataagg$x,na.rm=TRUE)
+meandiff <- mean(imputedagg$steps,na.rm=TRUE) - mean(dataagg$x,na.rm=TRUE)
              
-if (mean(imputedagg$x,na.rm=TRUE) > mean(dataagg$x,na.rm=TRUE))
+if (mean(imputedagg$steps,na.rm=TRUE) > mean(dataagg$x,na.rm=TRUE))
   difftext <- "more" else  difftext <- "less"
 
 ```

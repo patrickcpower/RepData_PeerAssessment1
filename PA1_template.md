@@ -30,12 +30,13 @@ The mean total number of steps per day is 9354.23 and the median number of steps
 
 ```r
 aggint <- aggregate(data$steps, by=list(Category=data$interval), FUN=mean,na.rm=TRUE)
-plot(x ~ Category, aggint, type = "l")
+aggint <- aggregate(steps ~ interval,data = data,FUN=function(x) c(steps =mean(x,na.rm=TRUE) ))
+plot(steps ~ interval, aggint, type = "l")
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
 
-The 5-minute interval at 835, on average across all the days in the dataset, contains the maximum number of steps (206.1698113).
+The 5-minute interval at , on average across all the days in the dataset, contains the maximum number of steps (-\infty{}).
 
 ## Imputing missing values
 
@@ -44,7 +45,7 @@ The 5-minute interval at 835, on average across all the days in the dataset, con
 imputed <- data.frame(data)
 repfunc <- function(a,b,c) 
   { if(is.na(a)) 
-       c$x[c$Category == b]
+       c$steps[c$interval == b]
     else
       a
   }
@@ -52,21 +53,22 @@ for(row in 1:length(imputed$steps)) {
     imputed$steps[row] <- repfunc(imputed$steps[row], imputed$interval[row],aggint) 
 }
 imputedagg <- aggregate(imputed$steps, by=list(Category=imputed$date), FUN=sum,na.rm=TRUE)
+imputedagg <- aggregate(steps ~ date,data = imputed,FUN=function(x) c(steps =sum(x) ) )
 
-hist(imputedagg$x, main="Steps per day",col="red",xlab="")
+hist(imputedagg$steps, main="Steps per day",col="red",xlab="")
 ```
 
 ![](./PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
 
 ```r
-meandiff <- mean(imputedagg$x,na.rm=TRUE) - mean(dataagg$x,na.rm=TRUE)
+meandiff <- mean(imputedagg$steps,na.rm=TRUE) - mean(dataagg$x,na.rm=TRUE)
              
-if (mean(imputedagg$x,na.rm=TRUE) > mean(dataagg$x,na.rm=TRUE))
+if (mean(imputedagg$steps,na.rm=TRUE) > mean(dataagg$x,na.rm=TRUE))
   difftext <- "more" else  difftext <- "less"
 ```
 
 The number of rows with missing data is 2304.
-The mean total number of steps per day is 10766.19 and the median number of steps per day is 10766.19.
+The mean total number of steps per day is NA and the median number of steps per day is .
 
 There are 1411.959171 more mean daily steps in the imputed  data than in the original data. 
 
